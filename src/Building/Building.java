@@ -1,8 +1,10 @@
 package Building;
+
 import java.util.Observable;
 import java.util.Observer;
-
 import javafx.event.EventHandler;
+import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -20,10 +22,13 @@ public class Building extends StackPane implements Observer {
 	/** Rectangle structure of the Building object.*/
 	private Rectangle rectangle;
 	
-	/**  */
+	/** TextField which appear on double click. */
+	private EditableName editableName;
+	
+	/** Position into scene values. */
 	double orgSceneX, orgSceneY;
 	
-	/**  */
+	/** Translation values. */
     double orgTranslateX, orgTranslateY;
 	
 	/**
@@ -37,19 +42,40 @@ public class Building extends StackPane implements Observer {
 	 * @param height
 	 */
 	public Building (	String name, 
-			 			double x, double y, double width, double height){
+			 		double x, double y, double width, double height){
 		super();
+		// Instantiate state of current building.
 		this.state = new State();
-		this.state.addObs(this);
+		// Observer use to update color when state change.
+		this.state.addObs(this); 
+		// Set position.
 		this.setTranslateX(x);this.setTranslateY(y);
+		// Set size.
 		this.setWidth(width);this.setHeight(height);
+		// Set rectangle structure.
 		this.rectangle = new Rectangle (x, y, width, height);
-		this.rectangle.setFill(this.state.getColor());		
+		// Set color structure.
+		this.rectangle.setFill(this.state.getColor());
+		// Set name of building.
 		this.name = new Text(name);
-		this.setOnMousePressed(onMousePressEvent); this.setOnMouseDragged(onMouseDragEvent);
+		// Set move listener.
+		this.setOnMousePressed(onMousePressEvent); this.setOnMouseDragged(onMouseDragEvent); 
+		// Set on doubleClick on text/name listener.
+		this.name.setOnMouseClicked(onDoubleClickEvent);
+		// Set textField when onDoubleClick on text.
+		this.editableName = new EditableName(()->updateEditableName(),()->finishTextField()); 
 		this.getChildren().addAll(this.rectangle, this.name);
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 * Run when state change into State.java.
+	 */
+	@Override
+	public void update(Observable o, Object arg) {
+		// TODO Auto-generated method stub
+		this.rectangle.setFill(this.state.getColor());
+	}
 	
 	/**
 	 * Set color of the rectangle (the structure) of Building object.
@@ -111,11 +137,48 @@ public class Building extends StackPane implements Observer {
             ((Building)(t.getSource())).setTranslateY(newTranslateY);
         }
     };
-
-	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		System.out.println("Update");
-		this.rectangle.setFill(this.state.getColor());
-	}
+    
+    /**
+     * Event run on double click on Text name.
+     */    
+	EventHandler<MouseEvent> onDoubleClickEvent = 
+			new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					// TODO Auto-generated method stub
+					if(event.getButton().equals(MouseButton.PRIMARY)){
+			            if(event.getClickCount() == 2){
+			            	initEditableName();
+			            }
+			        }
+				}
+	};
+    
+    /**
+     * Run on init of EditableName.
+     */
+    private void initEditableName() {
+    	editableName.setText(name.getText());  
+	    this.getChildren().add(editableName);  
+	    editableName.selectAll();  
+	    editableName.requestFocus();
+    }
+    
+    /**
+     * Run on update of EditableName.
+     */    
+    private void updateEditableName() {
+	    name.setText(editableName.getText());  
+    }
+    
+    /**
+     * Run on finish of EditableName.
+     */ 
+    private void finishTextField() {
+    	System.out.println("OnFinish");
+    	name.setText(editableName.getText()); 	  
+    	if (this.getChildren().get(this.getChildren().size()-1) instanceof TextField) {
+    		this.getChildren().remove(this.getChildren().size()-1);
+    	}
+    }
 }

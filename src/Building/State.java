@@ -2,7 +2,6 @@ package Building;
 
 import java.util.Observable;
 import java.util.Observer;
-
 import javafx.scene.paint.Color;
 
 public class State {
@@ -17,6 +16,7 @@ public class State {
 	private final Color COLOR_OK = 		Color.GREEN;
 	private final Color COLOR_UNKNOWN = Color.YELLOW;
 
+
 	private class Obs extends Observable {
 		// If you want easily to do many actions in one function
 		public void update() {
@@ -30,6 +30,9 @@ public class State {
 	}
 	private Obs obs = null;
 	
+	/**
+	 * Instantiate a new state.
+	 */
 	State(){
 		this.state = StateValue.UNKNOWN;
 		this.color = COLOR_UNKNOWN;
