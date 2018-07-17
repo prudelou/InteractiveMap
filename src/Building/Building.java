@@ -175,7 +175,6 @@ public class Building extends StackPane implements Observer {
      * Run on finish of EditableName.
      */ 
     private void finishTextField() {
-    	System.out.println("OnFinish");
     	name.setText(editableName.getText()); 	  
     	if (this.getChildren().get(this.getChildren().size()-1) instanceof TextField) {
     		this.getChildren().remove(this.getChildren().size()-1);
